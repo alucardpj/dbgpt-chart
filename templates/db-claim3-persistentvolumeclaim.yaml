@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "dbgpt-chart.fullname" . }}-claim3
+  labels:
+    io.kompose.service: db-claim3
+  {{- include "dbgpt-chart.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.pvc.claim3.storageRequest | quote }}

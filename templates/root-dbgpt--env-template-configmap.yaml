@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+  labels:
+    io.kompose.service: webserver-root-dbgpt--env-template
+  {{- include "dbgpt-chart.labels" . | nindent 4 }}
+data:
+  ALLOWLISTED_PLUGINS: {{ .Values.rootDbgptEnvTemplate.allowlistedPlugins | quote
+    }}
+  BARD_PROXY_API_KEY: {{ .Values.rootDbgptEnvTemplate.bardProxyApiKey | quote }}
+  DBGPT_LOG_LEVEL: {{ .Values.rootDbgptEnvTemplate.dbgptLogLevel | quote }}
+  DENYLISTED_PLUGINS: {{ .Values.rootDbgptEnvTemplate.denylistedPlugins | quote }}
+  EMBEDDING_MODEL: {{ .Values.rootDbgptEnvTemplate.embeddingModel | quote }}
+  EXECUTE_LOCAL_COMMANDS: {{ .Values.rootDbgptEnvTemplate.executeLocalCommands |
+    quote }}
+  KNOWLEDGE_CHUNK_SIZE: {{ .Values.rootDbgptEnvTemplate.knowledgeChunkSize | quote
+    }}
+  KNOWLEDGE_SEARCH_TOP_SIZE: {{ .Values.rootDbgptEnvTemplate.knowledgeSearchTopSize
+    | quote }}
+  LANGUAGE: {{ .Values.rootDbgptEnvTemplate.language | quote }}
+  LIMIT_MODEL_CONCURRENCY: {{ .Values.rootDbgptEnvTemplate.limitModelConcurrency
+    | quote }}
+  LLM_MODEL: {{ .Values.rootDbgptEnvTemplate.llmModel | quote }}
+  LOCAL_DB_PATH: {{ .Values.rootDbgptEnvTemplate.localDbPath | quote }}
+  LOCAL_DB_TYPE: {{ .Values.rootDbgptEnvTemplate.localDbType | quote }}
+  MAX_POSITION_EMBEDDINGS: {{ .Values.rootDbgptEnvTemplate.maxPositionEmbeddings
+    | quote }}
+  MODEL_SERVER: {{ .Values.rootDbgptEnvTemplate.modelServer | quote }}
+  PROXY_API_KEY: {{ .Values.rootDbgptEnvTemplate.proxyApiKey | quote }}
+  PROXY_SERVER_URL: {{ .Values.rootDbgptEnvTemplate.proxyServerUrl | quote }}
+  QUANTIZE_8bit: {{ .Values.rootDbgptEnvTemplate.qUANTIZE8Bit | quote }}
+  QUANTIZE_QLORA: {{ .Values.rootDbgptEnvTemplate.quantizeQlora | quote }}
+  SUMMARY_CONFIG: {{ .Values.rootDbgptEnvTemplate.summaryConfig | quote }}
+  VECTOR_STORE_TYPE: {{ .Values.rootDbgptEnvTemplate.vectorStoreType | quote }}
+  WEB_SERVER_PORT: {{ .Values.rootDbgptEnvTemplate.webServerPort | quote }}

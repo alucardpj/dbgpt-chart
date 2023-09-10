@@ -1,0 +1,176 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dbgpt-chart.fullname" . }}-webserver
+  labels:
+    io.kompose.service: webserver
+  {{- include "dbgpt-chart.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.30.0 (9d8dcb518)
+spec:
+  replicas: {{ .Values.webserver.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: webserver
+    {{- include "dbgpt-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/dbgptnet: "true"
+        io.kompose.service: webserver
+      {{- include "dbgpt-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.30.0 (9d8dcb518)
+    spec:
+      containers:
+      - args: {{- toYaml .Values.webserver.webserver.args | nindent 8 }}
+        env:
+        - name: ALLOWLISTED_PLUGINS
+          valueFrom:
+            configMapKeyRef:
+              key: ALLOWLISTED_PLUGINS
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: BARD_PROXY_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: BARD_PROXY_API_KEY
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: DBGPT_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              key: DBGPT_LOG_LEVEL
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: DENYLISTED_PLUGINS
+          valueFrom:
+            configMapKeyRef:
+              key: DENYLISTED_PLUGINS
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: EMBEDDING_MODEL
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: EXECUTE_LOCAL_COMMANDS
+          valueFrom:
+            configMapKeyRef:
+              key: EXECUTE_LOCAL_COMMANDS
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: KNOWLEDGE_CHUNK_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: KNOWLEDGE_CHUNK_SIZE
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: KNOWLEDGE_SEARCH_TOP_SIZE
+          valueFrom:
+            configMapKeyRef:
+              key: KNOWLEDGE_SEARCH_TOP_SIZE
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: LANGUAGE
+          valueFrom:
+            configMapKeyRef:
+              key: LANGUAGE
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: LIMIT_MODEL_CONCURRENCY
+          valueFrom:
+            configMapKeyRef:
+              key: LIMIT_MODEL_CONCURRENCY
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: LLM_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: LLM_MODEL
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: LOCAL_DB_HOST
+          value: {{ quote .Values.webserver.webserver.env.localDbHost }}
+        - name: LOCAL_DB_PASSWORD
+          value: {{ quote .Values.webserver.webserver.env.localDbPassword }}
+        - name: LOCAL_DB_PATH
+          valueFrom:
+            configMapKeyRef:
+              key: LOCAL_DB_PATH
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: LOCAL_DB_TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: LOCAL_DB_TYPE
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: MAX_POSITION_EMBEDDINGS
+          valueFrom:
+            configMapKeyRef:
+              key: MAX_POSITION_EMBEDDINGS
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: MODEL_SERVER
+          valueFrom:
+            configMapKeyRef:
+              key: MODEL_SERVER
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: PROXY_API_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: PROXY_API_KEY
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: PROXY_SERVER_URL
+          valueFrom:
+            configMapKeyRef:
+              key: PROXY_SERVER_URL
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: QUANTIZE_8bit
+          valueFrom:
+            configMapKeyRef:
+              key: QUANTIZE_8bit
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: QUANTIZE_QLORA
+          valueFrom:
+            configMapKeyRef:
+              key: QUANTIZE_QLORA
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: SUMMARY_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              key: SUMMARY_CONFIG
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: VECTOR_STORE_TYPE
+          valueFrom:
+            configMapKeyRef:
+              key: VECTOR_STORE_TYPE
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: WEB_SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: WEB_SERVER_PORT
+              name: {{ include "dbgpt-chart.fullname" . }}-root-dbgpt--env-template
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.webserver.webserver.image.repository }}:{{ .Values.webserver.webserver.image.tag
+          | default .Chart.AppVersion }}
+        name: webserver
+        ports:
+        - containerPort: 5000
+          hostPort: 5000
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /data
+          name: webserver-claim0
+        - mountPath: /app/models
+          name: webserver-claim1
+        - mountPath: /app/pilot/data
+          name: dbgpt-data
+        - mountPath: /app/pilot/message
+          name: dbgpt-message
+      restartPolicy: Always
+      volumes:
+      - name: webserver-claim0
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-webserver-claim0
+      - name: webserver-claim1
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-webserver-claim1
+      - name: dbgpt-data
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-gpt-data
+      - name: dbgpt-message
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-gpt-message

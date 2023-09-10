@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dbgpt-chart.fullname" . }}-db
+  labels:
+    io.kompose.service: db
+  {{- include "dbgpt-chart.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.30.0 (9d8dcb518)
+spec:
+  replicas: {{ .Values.db.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: db
+    {{- include "dbgpt-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/dbgptnet: "true"
+        io.kompose.service: db
+      {{- include "dbgpt-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.30.0 (9d8dcb518)
+    spec:
+      containers:
+      - env:
+        - name: MYSQL_PASSWORD
+          value: {{ quote .Values.db.db.env.mysqlPassword }}
+        - name: MYSQL_ROOT_PASSWORD
+          value: {{ quote .Values.db.db.env.mysqlRootPassword }}
+        - name: MYSQL_USER
+          value: {{ quote .Values.db.db.env.mysqlUser }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.db.db.image.repository }}:{{ .Values.db.db.image.tag | default
+          .Chart.AppVersion }}
+        name: db
+        ports:
+        - containerPort: 3306
+          hostPort: 3306
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: dbgpt-myql-db
+        - mountPath: /etc/my.cnf
+          name: db-claim1
+        - mountPath: /docker-entrypoint-initdb.d
+          name: db-claim2
+        - mountPath: /docker-entrypoint-initdb.d/knowledge_management.sql
+          name: db-claim3
+      restartPolicy: Always
+      volumes:
+      - name: dbgpt-myql-db
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-gpt-myql-db
+      - name: db-claim1
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-claim1
+      - name: db-claim2
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-claim2
+      - name: db-claim3
+        persistentVolumeClaim:
+          claimName: {{ include "dbgpt-chart.fullname" . }}-claim3

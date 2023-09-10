@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dbgpt-chart.fullname" . }}-db
+  labels:
+    io.kompose.service: db
+  {{- include "dbgpt-chart.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.30.0 (9d8dcb518)
+spec:
+  type: {{ .Values.db.type }}
+  selector:
+    io.kompose.service: db
+  {{- include "dbgpt-chart.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.db.ports | toYaml | nindent 2 -}}

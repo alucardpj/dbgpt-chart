@@ -1,0 +1,73 @@
+db:
+  db:
+    env:
+      mysqlPassword: password
+      mysqlRootPassword: aa123456
+      mysqlUser: user
+    image:
+      repository: mysql/mysql-server
+      tag: latest
+  ports:
+  - name: "3306"
+    port: 3306
+    targetPort: 3306
+  replicas: 1
+  type: ClusterIP
+kubernetesClusterDomain: cluster.local
+pvc:
+  claim1:
+    storageRequest: 100Mi
+  claim2:
+    storageRequest: 100Mi
+  claim3:
+    storageRequest: 100Mi
+  gptData:
+    storageRequest: 100Mi
+  gptMessage:
+    storageRequest: 100Mi
+  gptMyqlDb:
+    storageRequest: 100Mi
+  webserverClaim0:
+    storageRequest: 100Mi
+  webserverClaim1:
+    storageRequest: 100Mi
+rootDbgptEnvTemplate:
+  allowlistedPlugins: ""
+  bardProxyApiKey: '{your-bard-token}'
+  dbgptLogLevel: INFO
+  denylistedPlugins: ""
+  embeddingModel: text2vec
+  executeLocalCommands: "False"
+  knowledgeChunkSize: "500"
+  knowledgeSearchTopSize: "5"
+  language: en
+  limitModelConcurrency: "5"
+  llmModel: vicuna-13b-v1.5
+  localDbPath: data/default_sqlite.db
+  localDbType: sqlite
+  maxPositionEmbeddings: "4096"
+  modelServer: http://127.0.0.1:8000
+  proxyApiKey: '{your-openai-sk}'
+  proxyServerUrl: https://api.openai.com/v1/chat/completions
+  qUANTIZE8Bit: "True"
+  quantizeQlora: "True"
+  summaryConfig: FAST
+  vectorStoreType: Chroma
+  webServerPort: "7860"
+webserver:
+  ports:
+  - name: "5000"
+    port: 5000
+    targetPort: 5000
+  replicas: 1
+  type: ClusterIP
+  webserver:
+    args:
+    - python3
+    - pilot/server/dbgpt_server.py
+    env:
+      localDbHost: db
+      localDbPassword: aa123456
+    image:
+      repository: eosphorosai/dbgpt
+      tag: latest
